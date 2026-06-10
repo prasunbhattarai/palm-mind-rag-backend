@@ -1,7 +1,12 @@
 import os
+from dotenv import load_dotenv
 from google import genai
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+load_dotenv()
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
 def get_embedding(text: str) -> list[float]:
     response = client.models.embed_content(
@@ -10,4 +15,3 @@ def get_embedding(text: str) -> list[float]:
     )
 
     return response.embeddings[0].values
-
