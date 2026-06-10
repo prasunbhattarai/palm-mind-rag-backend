@@ -15,8 +15,9 @@ def fix_chunking(text:str, chunck_size: int = 100, overlap: int = 20):
     return chunks
 
 
-def recursive_chunk(text:str, chuck_size: int = 200, overlap: int =40):
-    
-    splitter = RecursiveCharacterTextSplitter(chuck_size=chuck_size, chuck_overlap = overlap)
-
+def recursive_chunk(text: str, chunk_size: int = 200, overlap: int = 40):
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=overlap
+    )
     return splitter.split_text(text)
