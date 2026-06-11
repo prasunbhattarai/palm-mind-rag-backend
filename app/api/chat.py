@@ -51,9 +51,8 @@ def chat(req: ChatRequest):
             interview_time=booking_info["time"],
         )
         if booking.get("status") == "error":
-            chunks = search_documents(req.message)
-            context = "\n\n".join(chunks) if chunks else "No relevant documents found."
-            reply = generate_response(req.message, context, history_str)
+            reply = f"Sorry, I couldn't complete the booking: {booking.get('message', 'unknown error')}"
+
         else:
             reply = (
                 f"Booking confirmed! Here are the details:\n"
