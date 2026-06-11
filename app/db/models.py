@@ -12,10 +12,15 @@ class Document(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String, nullable=False)
+    chunk_strategy = Column(String, nullable=False)
+    chunks_count = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
 
 
 
 class Booking(Base):
+    __tablename__ = "booking"
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
