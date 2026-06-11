@@ -30,7 +30,7 @@ Answer using the provided context whenever possible.
 """
 
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 
@@ -41,7 +41,7 @@ def extract_booking_info(message: str):
     client = get_client()
 
     prompt = f"""
-Extract interview booking information.
+Extract interview booking information. Return date in YYYY-MM-DD format and time in HH:MM 24-hour format.
 
 Return ONLY valid JSON.
 
@@ -52,7 +52,7 @@ Message:
 """
 
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 
