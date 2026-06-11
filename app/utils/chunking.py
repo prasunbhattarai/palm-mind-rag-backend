@@ -1,17 +1,15 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
-def fix_chunking(text:str, chunck_size: int = 100, overlap: int = 20):
-    chunks =[]
+def fixed_chunking(text: str, chunk_size: int = 100, overlap: int = 20):
+    chunks = []
     start = 0
 
     while start < len(text):
-        end = start + chunck_size
-
+        end = start + chunk_size
         chunks.append(text[start:end])
+        start += chunk_size - overlap
 
-        start += chunck_size - overlap
-    
     return chunks
 
 
