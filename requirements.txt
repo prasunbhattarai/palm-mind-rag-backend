@@ -1,6 +1,8 @@
 fastapi
 uvicorn[standard]
-SQLAlchemy 
+python-multipart
+SQLAlchemy
+psycopg2-binary
 redis
 qdrant-client
 python-dotenv

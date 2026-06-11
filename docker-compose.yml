@@ -4,9 +4,19 @@ services:
     ports:
       - "8000:80"
     depends_on:
-      - postgres
-      - redis
-      - qdrant
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      qdrant:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      QDRANT_HOST: qdrant
+      REDIS_HOST: redis
+    restart: unless-stopped
 
   postgres:
     image: postgres:17
