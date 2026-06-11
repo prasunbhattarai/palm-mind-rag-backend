@@ -7,11 +7,15 @@ from app.api.chat import router as chat_router
 from app.api.booking import router as booking_router
 from app.db.models import Base
 from app.db.postgres import engine
+from app.db.qdrant import create_collection
+from app.utils.embeddings import get_embedding
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    dim = len(get_embedding("init"))
+    create_collection(dim)
     yield
 
 

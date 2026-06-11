@@ -1,6 +1,6 @@
 # Palm Mind RAG Backend
 
-RAG-powered FastAPI backend with document ingestion, semantic search, and chat.
+RAG-powered FastAPI backend with document ingestion, semantic search, chat, and interview booking.
 
 ## Prerequisites
 
@@ -27,16 +27,24 @@ docker compose up -d --build
 
 The API is available at `http://localhost:8000`.
 
+After making code changes, rebuild the FastAPI container:
+
+```bash
+docker compose build fastapi && docker compose up -d fastapi
+```
+
 ## API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/chat` | POST | Chat with RAG context |
+| `/chat` | POST | Chat with RAG context (auto-detects booking intents) |
 | `/ingest` | POST | Upload a document (.txt / .pdf) |
-| `/booking` | POST | Create an interview booking |
+| `/booking` | POST | Create an interview booking (direct API) |
 | `/docs` | GET | Swagger UI documentation |
 
 ### Chat
+
+Main conversational endpoint. **Booking is done through chat** — the system auto-detects booking intents from your message via Gemini. No need to call `/booking` separately.
 
 ```json
 POST /chat
@@ -46,9 +54,25 @@ POST /chat
 }
 ```
 
+**Booking via chat:**
+
+```json
+POST /chat
+{
+  "session_id": "user-123",
+  "message": "Book an appointment for Prasun Bhattarai at prasunbhattarai2003@gmail.com on June 15 at 2pm"
+}
+```
+
+Use natural language for the date and time (e.g. "June 15 at 2pm") — the LLM will extract and convert it to the required format automatically.
+
 ### Ingest a document
 
-Upload a `.txt` or `.pdf` file with an optional chunking strategy (`fixed` or `recursive`).
+Upload a `.txt` or `.pdf` file with a chunking strategy.
+
+**Strategies:**
+- `fixed` — splits text into fixed-size chunks (100 chars, 20 overlap)
+- `recursive` — uses `RecursiveCharacterTextSplitter` (200 chars, 40 overlap)
 
 ```bash
 curl -X POST http://localhost:8000/ingest \
@@ -56,7 +80,9 @@ curl -X POST http://localhost:8000/ingest \
   -F "strategy=recursive"
 ```
 
-### Create a booking
+In Postman: `POST http://localhost:8000/ingest?strategy=recursive`, body `form-data` with `file` (File) and optional `strategy` (Text).
+
+### Create a booking (direct)
 
 ```json
 POST /booking
@@ -67,19 +93,25 @@ POST /booking
   "time": "10:00"
 }
 ```
-```
 
-Make sure PostgreSQL, Redis, and Qdrant are running and accessible via the hosts in `.env`.
+## Services
+
+| Service | Image | Port |
+|---------|-------|------|
+| FastAPI | palm-mind-rag-backend-fastapi | `8000:80` |
+| PostgreSQL | postgres:17 | `5432` |
+| Redis | redis:latest | `6379` |
+| Qdrant | qdrant/qdrant:latest | `6333` |
 
 ## Project Structure
 
 ```
 app/
-  api/          # Route handlers
+  api/          # Route handlers (chat, ingest, booking)
   core/         # Config
   db/           # Database clients (PostgreSQL, Redis, Qdrant)
   models/       # SQLAlchemy models
   services/     # Business logic (RAG, ingestion, booking, LLM)
   utils/        # Utilities (PDF reader, chunking, embeddings)
-  main.py       # FastAPI entry point
+  main.py       # FastAPI entry point with lifespan (creates DB tables and Qdrant collection at startup)
 ```
