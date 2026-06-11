@@ -61,8 +61,8 @@ curl -X POST http://localhost:8000/ingest \
 ```json
 POST /booking
 {
-  "name": "John Doe",
-  "email": "john@example.com",
+  "name": "Prasun Bhattarai",
+  "email": "prasun@example.com",
   "date": "2026-06-15",
   "time": "10:00"
 }
