@@ -6,7 +6,7 @@ router = APIRouter()
 @router.post("/ingest")
 async def ingest_file(
     file: UploadFile = File(...),
-    strategy: str = Query("recursive", regex="^(fixed|recursive)$")
+    strategy: str = Query("recursive", pattern="^(fixed|recursive)$")
 ):
-    result = ingest_document(file.file, strategy)
+    result = ingest_document(file.file, file.filename, strategy)
     return result
