@@ -1,10 +1,18 @@
+import json
 import os
+import re
+from functools import cache
+
 from google import genai
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+@cache
+def get_client():
+    return genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
-def generate_response(query: str,context: str,history: str) -> str:
+def generate_response(query: str, context: str, history: str):
+    client = get_client()
 
     prompt = f"""
 You are a helpful assistant.
@@ -22,39 +30,35 @@ Answer using the provided context whenever possible.
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         contents=prompt
     )
 
     return response.text
 
 
-
-import json
-
-
 def extract_booking_info(message: str):
+    client = get_client()
 
     prompt = f"""
 Extract interview booking information.
 
 Return ONLY valid JSON.
 
-{{
-    "is_booking": true,
-    "name": "",
-    "email": "",
-    "date": "",
-    "time": ""
-}}
+{{"is_booking": true, "name": "", "email": "", "date": "", "time": ""}}
 
 Message:
 {message}
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         contents=prompt
     )
 
-    return json.loads(response.text)
+    text = response.text.strip()
+    match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+    if match:
+        text = match.group(1).strip()
+
+    return json.loads(text)
